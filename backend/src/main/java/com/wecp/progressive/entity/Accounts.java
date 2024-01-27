@@ -1,6 +1,6 @@
 package com.wecp.progressive.entity;
 
-public class Accounts {
+public class Accounts implements Comparable<Accounts>{
 
     private int accountId;
     private int customerId;
@@ -39,6 +39,12 @@ public class Accounts {
 
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+
+    @Override
+    public int compareTo(Accounts o) {
+        // TODO Auto-generated method stub
+        return Double.compare(this.getBalance(),o.getBalance());
     }
 
 }

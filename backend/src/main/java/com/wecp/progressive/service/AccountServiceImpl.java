@@ -6,11 +6,13 @@ import com.wecp.progressive.entity.Accounts;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class AccountServiceImpl implements AccountService {
+    
 
-    private static List<Accounts> accountsList = new ArrayList<>();
+    private static List<Accounts> al = new ArrayList<>();
     private AccountDAO accountDAO;
 
     public AccountServiceImpl(AccountDAO accountDAO) {
@@ -53,21 +55,24 @@ public class AccountServiceImpl implements AccountService {
     }
     @Override
     public List<Accounts> getAllAccountsSortedByBalanceFromArrayList() {
-        return null;
+        List<Accounts> sa=al;
+        sa.sort(Comparator.comparingDouble(Accounts::getBalance));
+        return sa;
     }
 
     @Override
     public void emptyArrayList() {
-        
+        al=new ArrayList<>();
     }
 
     @Override
     public List<Accounts> getAllAccountsFromArrayList() {
-        return null;
+        return al;
     }
     
     @Override
     public List<Accounts> addAccountToArrayList(Accounts accounts) {
-        return null;
+        al.add(accounts);
+        return al;
     }
 }
