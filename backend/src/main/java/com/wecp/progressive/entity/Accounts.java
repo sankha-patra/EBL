@@ -1,7 +1,15 @@
 package com.wecp.progressive.entity;
 
-public class Accounts implements Comparable<Accounts>{
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
+@Entity
+public class Accounts implements Comparable<Accounts> {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int accountId;
     private int customerId;
     private double balance;
@@ -42,9 +50,8 @@ public class Accounts implements Comparable<Accounts>{
     }
 
     @Override
-    public int compareTo(Accounts o) {
-        // TODO Auto-generated method stub
-        return Double.compare(this.getBalance(),o.getBalance());
+    public int compareTo(Accounts otherAccounts) {
+        // Implement comparison logic based on account balance
+        return Double.compare(this.getBalance(), otherAccounts.getBalance());
     }
-
 }
