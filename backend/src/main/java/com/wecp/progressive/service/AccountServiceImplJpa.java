@@ -1,30 +1,25 @@
 package com.wecp.progressive.service;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
+import com.wecp.progressive.entity.Accounts;
+import com.wecp.progressive.exception.AccountNotFoundException;
+import com.wecp.progressive.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.wecp.progressive.entity.Accounts;
-import com.wecp.progressive.repository.AccountRepository;
-
-import net.bytebuddy.dynamic.loading.ClassInjector.UsingUnsafe.Factory.AccessResolver;
+import java.sql.SQLException;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 @Service
-public class AccountServiceImplJpa implements AccountService {
+public class AccountServiceImplJpa implements AccountService{
 
+    private AccountRepository accountRepository;
     @Autowired
-    AccountRepository accountRepository;
-    
-
     public AccountServiceImplJpa(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
-
-    private static List<Accounts> acc = new ArrayList<>();
 
     @Override
     public List<Accounts> getAllAccounts() throws SQLException {
@@ -32,60 +27,61 @@ public class AccountServiceImplJpa implements AccountService {
     }
 
     @Override
-    public List<Accounts> getAccountsByUser(int userId) throws SQLException {
-        return accountRepository.findByCustomerId(userId);
+    public List<Accounts> getAccountsByUser(int customerId) throws SQLException {
+        return accountRepository.getAccountsByCustomerCustomerId(customerId);
     }
 
     @Override
-    public Accounts getAccountById(int accountId) throws SQLException {
-        return accountRepository.findById(accountId).get();
+    public Accounts getAccountById(int accountId) {
+        Optional<Accounts> accounts = accountRepository.findById(accountId);
+        if (accounts.isPresent()) {
+            return accounts.get();
+        }
+        else {
+            throw new AccountNotFoundException("No accounts found linked with this accountId");
+        }
     }
 
     @Override
-    public int addAccount(Accounts accounts) throws SQLException {
+    public int addAccount(Accounts accounts) {
         return accountRepository.save(accounts).getAccountId();
     }
 
     @Override
-    public void updateAccount(Accounts accounts) throws SQLException {
-        accountRepository.findById(accounts.getAccountId()).map(account -> {
-            account.setCustomerId(accounts.getCustomerId());
-            account.setBalance(accounts.getBalance());
-            return accountRepository.save(account);
-        });
+    public void updateAccount(Accounts accounts) {
+        accountRepository.save(accounts);
     }
 
     @Override
-    public void deleteAccount(int accountId) throws SQLException {
+    public void deleteAccount(int accountId) {
         accountRepository.deleteById(accountId);
     }
 
     @Override
     public List<Accounts> getAllAccountsSortedByBalance() throws SQLException {
-        return accountRepository.findByOrderByBalance();
+        List<Accounts> sortedAccounts = getAllAccounts();
+        sortedAccounts.sort(Comparator.comparingDouble(Accounts::getBalance)); // Sort by account balance
+        return sortedAccounts;
     }
 
+    // Do not implement these methods
     @Override
     public List<Accounts> getAllAccountsFromArrayList() {
-        return acc;
+        return null;
     }
 
     @Override
     public List<Accounts> addAccountToArrayList(Accounts accounts) {
-        acc.add(accounts);
-        return acc;
+        return null;
     }
 
     @Override
     public List<Accounts> getAllAccountsSortedByBalanceFromArrayList() {
-        List<Accounts> sortedAccounts = acc;
-        Collections.sort(sortedAccounts);
-        return sortedAccounts;
+        return null;
     }
 
     @Override
     public void emptyArrayList() {
-        acc = new ArrayList<>();
-    }
 
+    }
 }
